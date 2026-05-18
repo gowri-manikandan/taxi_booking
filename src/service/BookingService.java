@@ -1,83 +1,97 @@
 package service;
 
+import db.Repository;
 import model.Booking;
 import model.Taxi;
-import util.InputUtil;
-import util.OutputUtil;
-import view.BookingView;
+import util.Util;
+import view.View;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeMap;
 
 public class BookingService
 {
-    private final List<Taxi> taxiList ;
     int bookingID = 1;
-    BookingView view ;
-    public BookingService(BookingView view)
+    Repository repository ;
+    View view;
+    public BookingService(Repository repo, View view)
     {
-        taxiList = new ArrayList<>();
+        repository = repo;
         this.view = view;
     }
-    public void taxiInit(int count)
+    // get the basic data name of the company and number of taxis.
+    public void init()
     {
-        for(int i=1;i<=count;i++)
-        {
-            taxiList.add(new Taxi(i,0.0d));
-        }
-        callMainMenu();
-    }
-    public void callMainMenu()
-    {
+        String name = Util.getString("Enter the Taxi Company Name:",view);
+        int numberOfTaxi = Util.getNumberOfTaxis("Enter the Number of Taxis in your Company:",view);
+        initializeTaxi(numberOfTaxi);
+        view.printMassage("---------------------------------------------------------------------");
+        view.printMassage("                Welcome To "+name+" Call Taxis.                      ");
+        view.printMassage("---------------------------------------------------------------------");
+        view.printMassage("Taxis Are read for your Service. the taxi are in the Point A at 1 O'clock");
+        view.printMassage("Our Service are From A To F.\n");
         while (true)
-            view.printMainMenu();
-    }
-    public void menuOption(int choice)
-    {
-        switch (choice)
         {
-            case 1:
+            view.printMainMenu();
+            int choice = Util.getChoice("Enter Your choice :",view);
+            switch (choice)
             {
-                getBookingData();
-                break;
+                case 1:
+                {
+                    getBookingInfo();
+                    break;
+                }
+                case 2:
+                {
+                    displayTaxiDetails();
+                    break;
+                }
+                case 0:
+                {
+                    view.printMassage("Thank you for Using Our service.");
+                    view.printMassage("Come Back");
+                    view.printMassage("bye....");
+                    System.exit(1);
+                }
+                default:
+                {
+                    view.printError("Invalid Number.");
+                }
             }
-            case 2:
-            {
-                displayTaxiDetails();
-                break;
-            }
-            case 0:
-            {
-                OutputUtil.printOutput("Thank you for using our services.");
-                OutputUtil.printOutput("Come back soon..");
-                OutputUtil.printOutput("Bye.");
-                System.exit(10);
-            }
-            default:
-            {
-                OutputUtil.printError("Invalid input.");
-            }
+        }
+    }
+    // Initialize the taxis.
+    private void initializeTaxi(int numberOfTaxi)
+    {
+        for(int i=1;i<=numberOfTaxi;i++)
+        {
+            repository.addNewTaxi(new Taxi(i));
         }
     }
 
-    private void getBookingData()
+    // the booking information.
+    private void getBookingInfo()
     {
-        int customerID = InputUtil.getPositiveInt("Customer ID:");
-        char pickupPoint = InputUtil.getPoint("Pickup Point:");
-        char dropPoint = InputUtil.getPoint("Drop Point:");
-        int pickupTime = InputUtil.getTime("Pickup Time:");
+        int customerID = Util.getCustomerID("Customer ID:",view);
+        char pickupPoint = Util.getPickupORDropPoint("Pickup Point:",view);
+        char dropPoint = Util.getPickupORDropPoint("Drop Point:",view);
         if (pickupPoint == dropPoint)
         {
-            OutputUtil.printError("The pickup Point and Drop point must not be same.");
+            view.printError("The pickup Point and Drop point must not be same.");
             return;
         }
+        int pickupTime = Util.getTime("Pickup Time:",view);
         checkAvailabilities(customerID,pickupPoint,dropPoint,pickupTime);
     }
 
+    // Check for the available taxis.
     private void checkAvailabilities(int customerID,char pickupPoint,char dropPoint,int pickupTime)
     {
+        List<Taxi> taxiList = repository.getTaxiList();
         List<Taxi> availableTaxi = new ArrayList<>();
-        // check the taxis in pickup point
+
+        // Check the taxis in pickup point
         for(Taxi taxi: taxiList)
         {
 //            int distance = Math.abs(taxi.getCurrentPoint()-pickupPoint);
@@ -85,7 +99,7 @@ public class BookingService
             int canArriveAt = taxi.getAvailableAt();
             if(taxi.getCurrentPoint()==pickupPoint && canArriveAt-pickupTime<=0)
             {
-              availableTaxi.add(taxi);
+                availableTaxi.add(taxi);
             }
         }
         if(!availableTaxi.isEmpty())
@@ -94,6 +108,7 @@ public class BookingService
         }
         else
         {
+            //  Check for the nearest Taxis
             int minDistance = Integer.MAX_VALUE;
             for(Taxi taxi: taxiList)
             {
@@ -116,23 +131,23 @@ public class BookingService
             }
             else
             {
-                OutputUtil.printOutput("No taxi is available at this time.booking is rejected");
+                view.printMassage("No taxi is available at this time.booking is rejected");
             }
 
         }
-        // check nearest taxis
     }
 
     public void selectTaxi(int customerID,char pickupPoint,char dropPoint,int pickupTime, List<Taxi> availableTaxi)
     {
-        //if one ia available at pickup point
+        //if one taxi is available
         if(availableTaxi.size()==1)
         {
             allocateTaxi(customerID,pickupPoint,dropPoint,pickupTime,availableTaxi.getFirst());
         }
-        // if more taxi are available at pickup point
+        // if more taxis are available
         else
         {
+            // find taxi with min earnings.
             Taxi selectedTaxi = availableTaxi.getFirst();
             double minEarning = selectedTaxi.getTotalEarning();
             for(Taxi taxi : availableTaxi)
@@ -146,32 +161,26 @@ public class BookingService
             allocateTaxi(customerID,pickupPoint,dropPoint,pickupTime,selectedTaxi);
         }
     }
-
+    // Allocating the taxi.
     public void allocateTaxi(int customerID,char pickupPoint,char dropPoint,int pickupTime,Taxi taxi)
     {
-        OutputUtil.printOutput("Taxi can be allotted.");
+        view.printMassage("Taxi can be allocate.");
         int duration = Math.abs(dropPoint-pickupPoint);
         int dropTime = pickupTime+duration;
         double cost = (duration-1)*150 + 200;
-
-        taxi.setBookingList(new Booking(customerID,bookingID++,pickupPoint,dropPoint,pickupTime,dropTime,cost));
+        repository.addNewBooking(taxi.getTaxiID(),new Booking(customerID,bookingID++,pickupPoint,dropPoint,pickupTime,dropTime,cost));
         taxi.setCurrentPoint(dropPoint);
         taxi.setAvailableAt(dropTime);
         taxi.setTotalEarning(taxi.getTotalEarning()+cost);
-        OutputUtil.printOutput("Taxi-"+taxi.getTaxiID()+" is allotted");
+        view.printMassage("Taxi-"+taxi.getTaxiID()+" is allocated");
     }
+
+    //Sent the data to view to print.
     private void displayTaxiDetails()
     {
-        OutputUtil.printOutput("Taxi No: Total Earnings:\n");
-        OutputUtil.printOutput("BookingID CustomerID From To PickupTime DropTime Amount");
-        for(Taxi taxi : taxiList)
-        {
-            OutputUtil.printOutput("Taxi : "+taxi.getTaxiID()+"                Total Earnings : "+taxi.getTotalEarning());
-            for(Booking booking : taxi.getBookingList())
-            {
-                OutputUtil.printOutput(" "+booking.getBookingID()+" "+booking.getCustomerID()+" "+booking.getPickupPoint()+" "+booking.getDropPoint()+" "+booking.getPickupTime()+" "+booking.getDropTime()+" "+booking.getCost());
-            }
-        }
+        List<Taxi> taxiList = repository.getTaxiList();
+        TreeMap<Integer,List<Booking>> bookingList = repository.getBookingList();
+        view.printReport(taxiList,bookingList);
     }
 
 }
