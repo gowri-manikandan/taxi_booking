@@ -25,6 +25,20 @@ public class InputUtil
             }
         }
     }
+
+    public static int getInt(String message)
+    {
+        while (true) {
+            System.out.println(message);
+
+            if (sc.hasNextInt()) {
+                return sc.nextInt();
+            } else {
+                System.out.println("Invalid input. Numbers only.");
+                sc.nextLine();
+            }
+        }
+    }
     public static char getPoint(String message)
     {
         while(true)

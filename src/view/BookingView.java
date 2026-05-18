@@ -24,8 +24,7 @@ public class BookingView
         System.out.println("1.Call taxi booking");
         System.out.println("2.Display the Taxi details");
         System.out.println("0.Exit");
-        System.out.println("Enter the choice");
-        int choice = InputUtil.sc.nextInt();
+        int choice = InputUtil.getInt("Enter the choice");
         service.menuOption(choice);
     }
 }
