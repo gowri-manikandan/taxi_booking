@@ -1,4 +1,4 @@
-package db;
+package repository;
 
 import model.Booking;
 import model.Taxi;
@@ -7,11 +7,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 
-public class Repository
+public class DB
 {
     private final List<Taxi> taxiList ;
     TreeMap<Integer,List<Booking>> bookingList;
-    public Repository(List<Taxi> taxiList, TreeMap<Integer, List<Booking>> bookingList)
+    public DB(List<Taxi> taxiList, TreeMap<Integer, List<Booking>> bookingList)
     {
         this.taxiList = taxiList;
         this.bookingList = bookingList;

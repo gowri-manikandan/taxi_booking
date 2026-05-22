@@ -2,7 +2,6 @@ package view;
 
 import model.Booking;
 import model.Taxi;
-import service.BookingService;
 
 import java.util.List;
 import java.util.TreeMap;

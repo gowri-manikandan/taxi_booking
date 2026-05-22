@@ -1,4 +1,4 @@
-import db.Repository;
+import repository.DB;
 import service.BookingService;
 import view.View;
 
@@ -7,9 +7,9 @@ import java.util.TreeMap;
 
 public class TaxiBooking
 {
-    Repository repository = new Repository(new ArrayList<>(),new TreeMap<>());
-    View view = new View();                  // View has no dependencies
-    BookingService service = new BookingService(repository, view);
+    DB DB = new DB(new ArrayList<>(),new TreeMap<>());
+    View view = new View();
+    BookingService service = new BookingService(DB, view);
     public void start()
     {
         service.init();

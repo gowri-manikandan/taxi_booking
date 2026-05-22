@@ -1,6 +1,6 @@
 package service;
 
-import db.Repository;
+import repository.DB;
 import model.Booking;
 import model.Taxi;
 import util.Util;
@@ -13,11 +13,11 @@ import java.util.TreeMap;
 public class BookingService
 {
     int bookingID = 1;
-    Repository repository ;
+    DB DB;
     View view;
-    public BookingService(Repository repo, View view)
+    public BookingService(DB repo, View view)
     {
-        repository = repo;
+        DB = repo;
         this.view = view;
     }
     // get the basic data name of the company and number of taxis.
@@ -66,7 +66,7 @@ public class BookingService
     {
         for(int i=1;i<=numberOfTaxi;i++)
         {
-            repository.addNewTaxi(new Taxi(i));
+            DB.addNewTaxi(new Taxi(i));
         }
     }
 
@@ -88,7 +88,7 @@ public class BookingService
     // Check for the available taxis.
     private void checkAvailabilities(int customerID,char pickupPoint,char dropPoint,int pickupTime)
     {
-        List<Taxi> taxiList = repository.getTaxiList();
+        List<Taxi> taxiList = DB.getTaxiList();
         List<Taxi> availableTaxi = new ArrayList<>();
 
         // Check the taxis in pickup point
@@ -168,7 +168,7 @@ public class BookingService
         int duration = Math.abs(dropPoint-pickupPoint);
         int dropTime = pickupTime+duration;
         double cost = (duration-1)*150 + 200;
-        repository.addNewBooking(taxi.getTaxiID(),new Booking(customerID,bookingID++,pickupPoint,dropPoint,pickupTime,dropTime,cost));
+        DB.addNewBooking(taxi.getTaxiID(),new Booking(customerID,bookingID++,pickupPoint,dropPoint,pickupTime,dropTime,cost));
         taxi.setCurrentPoint(dropPoint);
         taxi.setAvailableAt(dropTime);
         taxi.setTotalEarning(taxi.getTotalEarning()+cost);
@@ -178,8 +178,8 @@ public class BookingService
     //Sent the data to view to print.
     private void displayTaxiDetails()
     {
-        List<Taxi> taxiList = repository.getTaxiList();
-        TreeMap<Integer,List<Booking>> bookingList = repository.getBookingList();
+        List<Taxi> taxiList = DB.getTaxiList();
+        TreeMap<Integer,List<Booking>> bookingList = DB.getBookingList();
         view.printReport(taxiList,bookingList);
     }
 
