@@ -9,22 +9,30 @@ import java.util.TreeMap;
 
 public class DB
 {
-    private final List<Taxi> taxiList ;
+    private final List<Taxi> TAXI_LIST;
     TreeMap<Integer,List<Booking>> bookingList;
-    public DB(List<Taxi> taxiList, TreeMap<Integer, List<Booking>> bookingList)
+    static DB db;
+    public DB()
     {
-        this.taxiList = taxiList;
-        this.bookingList = bookingList;
+        TAXI_LIST = new ArrayList<>();
+        bookingList = new TreeMap<>();
     }
-
+    public static DB getInstance()
+    {
+        if(db==null)
+        {
+            db = new DB();
+        }
+        return db;
+    }
     public void addNewTaxi(Taxi newTaxi)
     {
-        taxiList.add(newTaxi);
+        TAXI_LIST.add(newTaxi);
     }
 
-    public List<Taxi> getTaxiList()
+    public List<Taxi> getTAXI_LIST()
     {
-        return taxiList;
+        return TAXI_LIST;
     }
 
     public void addNewBooking(int taxiID,Booking booking)

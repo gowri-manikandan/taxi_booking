@@ -2,49 +2,49 @@ package model;
 
 public class Booking
 {
-    private final int bookingID;
-    private final int customerID;
-    private final char pickupPoint;
-    private final char dropPoint;
-    private final int pickupTime;
-    private final int dropTime;
-    private final double cost;
+    private final int BOOKING_ID;
+    private final int CUSTOMER_ID;
+    private final char PICKUP_POINT;
+    private final char DROP_POINT;
+    private final int PICKUP_TIME;
+    private final int DROP_TIME;
+    private final double COST;
 
     public Booking(int customerID, int bookingID, char pickupPoint, char dropPoint, int pickupTime,int dropTime,double cost) {
-        this.customerID = customerID;
-        this.bookingID = bookingID;
-        this.pickupPoint = pickupPoint;
-        this.dropPoint = dropPoint;
-        this.pickupTime = pickupTime;
-        this.dropTime = dropTime;
-        this.cost = cost;
+        CUSTOMER_ID = customerID;
+        BOOKING_ID = bookingID;
+        PICKUP_POINT = pickupPoint;
+        DROP_POINT = dropPoint;
+        PICKUP_TIME = pickupTime;
+        DROP_TIME = dropTime;
+        COST = cost;
     }
 
-    public int getCustomerID() {
-        return customerID;
+    public int getCUSTOMER_ID() {
+        return CUSTOMER_ID;
     }
 
-    public char getPickupPoint() {
-        return pickupPoint;
+    public char getPICKUP_POINT() {
+        return PICKUP_POINT;
     }
 
-    public char getDropPoint() {
-        return dropPoint;
+    public char getDROP_POINT() {
+        return DROP_POINT;
     }
 
-    public int getPickupTime() {
-        return pickupTime;
+    public int getPICKUP_TIME() {
+        return PICKUP_TIME;
     }
 
     public int getBookingID() {
-        return bookingID;
+        return BOOKING_ID;
     }
 
-    public double getCost() {
-        return cost;
+    public double getCOST() {
+        return COST;
     }
 
-    public int getDropTime() {
-        return dropTime;
+    public int getDROP_TIME() {
+        return DROP_TIME;
     }
 }

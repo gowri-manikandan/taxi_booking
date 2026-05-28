@@ -3,7 +3,6 @@ package service;
 import repository.DB;
 import model.Booking;
 import model.Taxi;
-import util.Util;
 import view.View;
 
 import java.util.ArrayList;
@@ -15,54 +14,17 @@ public class BookingService
     int bookingID = 1;
     DB DB;
     View view;
-    public BookingService(DB repo, View view)
+    public BookingService(View view)
     {
-        DB = repo;
+        DB = repository.DB.getInstance();
         this.view = view;
     }
+
     // get the basic data name of the company and number of taxis.
-    public void init()
-    {
-        String name = Util.getString("Enter the Taxi Company Name:",view);
-        int numberOfTaxi = Util.getNumberOfTaxis("Enter the Number of Taxis in your Company:",view);
-        initializeTaxi(numberOfTaxi);
-        view.printMassage("---------------------------------------------------------------------");
-        view.printMassage("                Welcome To "+name+" Call Taxis.                      ");
-        view.printMassage("---------------------------------------------------------------------");
-        view.printMassage("Taxis Are read for your Service. the taxi are in the Point A at 1 O'clock");
-        view.printMassage("Our Service are From A To F.\n");
-        while (true)
-        {
-            view.printMainMenu();
-            int choice = Util.getChoice("Enter Your choice :",view);
-            switch (choice)
-            {
-                case 1:
-                {
-                    getBookingInfo();
-                    break;
-                }
-                case 2:
-                {
-                    displayTaxiDetails();
-                    break;
-                }
-                case 0:
-                {
-                    view.printMassage("Thank you for Using Our service.");
-                    view.printMassage("Come Back");
-                    view.printMassage("bye....");
-                    System.exit(1);
-                }
-                default:
-                {
-                    view.printError("Invalid Number.");
-                }
-            }
-        }
-    }
+
+
     // Initialize the taxis.
-    private void initializeTaxi(int numberOfTaxi)
+    public void initializeTaxi(int numberOfTaxi)
     {
         for(int i=1;i<=numberOfTaxi;i++)
         {
@@ -71,31 +33,29 @@ public class BookingService
     }
 
     // the booking information.
-    private void getBookingInfo()
+    public void getBookingInfo()
     {
-        int customerID = Util.getCustomerID("Customer ID:",view);
-        char pickupPoint = Util.getPickupORDropPoint("Pickup Point:",view);
-        char dropPoint = Util.getPickupORDropPoint("Drop Point:",view);
+        int customerID = view.getPositiveNUmber("Customer ID:");
+        char pickupPoint = view.getPickupORDropPoint("Pickup Point:");
+        char dropPoint = view.getPickupORDropPoint("Drop Point:");
         if (pickupPoint == dropPoint)
         {
-            view.printError("The pickup Point and Drop point must not be same.");
+            view.displayError("The pickup Point and Drop point must not be same.");
             return;
         }
-        int pickupTime = Util.getTime("Pickup Time:",view);
+        int pickupTime = view.getTime("Pickup Time:");
         checkAvailabilities(customerID,pickupPoint,dropPoint,pickupTime);
     }
 
     // Check for the available taxis.
     private void checkAvailabilities(int customerID,char pickupPoint,char dropPoint,int pickupTime)
     {
-        List<Taxi> taxiList = DB.getTaxiList();
+        List<Taxi> taxiList = DB.getTAXI_LIST();
         List<Taxi> availableTaxi = new ArrayList<>();
 
         // Check the taxis in pickup point
         for(Taxi taxi: taxiList)
         {
-//            int distance = Math.abs(taxi.getCurrentPoint()-pickupPoint);
-//            int canArriveAt = distance+taxi.getAvailableAt();
             int canArriveAt = taxi.getAvailableAt();
             if(taxi.getCurrentPoint()==pickupPoint && canArriveAt-pickupTime<=0)
             {
@@ -131,7 +91,7 @@ public class BookingService
             }
             else
             {
-                view.printMassage("No taxi is available at this time.booking is rejected");
+                view.displayStatement("No taxi is available at this time.booking is rejected");
             }
 
         }
@@ -164,23 +124,23 @@ public class BookingService
     // Allocating the taxi.
     public void allocateTaxi(int customerID,char pickupPoint,char dropPoint,int pickupTime,Taxi taxi)
     {
-        view.printMassage("Taxi can be allocate.");
+        view.displayStatement("Taxi can be allocate.");
         int duration = Math.abs(dropPoint-pickupPoint);
         int dropTime = pickupTime+duration;
         double cost = (duration-1)*150 + 200;
-        DB.addNewBooking(taxi.getTaxiID(),new Booking(customerID,bookingID++,pickupPoint,dropPoint,pickupTime,dropTime,cost));
+        DB.addNewBooking(taxi.getTAXI_ID(),new Booking(customerID,bookingID++,pickupPoint,dropPoint,pickupTime,dropTime,cost));
         taxi.setCurrentPoint(dropPoint);
         taxi.setAvailableAt(dropTime);
         taxi.setTotalEarning(taxi.getTotalEarning()+cost);
-        view.printMassage("Taxi-"+taxi.getTaxiID()+" is allocated");
+        view.displayStatement("Taxi-"+taxi.getTAXI_ID()+" is allocated");
     }
 
     //Sent the data to view to print.
-    private void displayTaxiDetails()
+    public void displayTaxiDetails()
     {
-        List<Taxi> taxiList = DB.getTaxiList();
+        List<Taxi> taxiList = DB.getTAXI_LIST();
         TreeMap<Integer,List<Booking>> bookingList = DB.getBookingList();
-        view.printReport(taxiList,bookingList);
+        view.displayReport(taxiList,bookingList);
     }
 
 }

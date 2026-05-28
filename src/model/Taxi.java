@@ -3,20 +3,20 @@ package model;
 
 public class Taxi
 {
-    private final int taxiID;
+    private final int TAXI_ID;
     private double totalEarning;
     private char currentPoint;
     private int availableAt;
 
     public Taxi(int taxiID) {
-        this.taxiID = taxiID;
+        this.TAXI_ID = taxiID;
         this.totalEarning = 0.0d;
         currentPoint = 'A';
         availableAt = 0;
     }
 
-    public int getTaxiID() {
-        return taxiID;
+    public int getTAXI_ID() {
+        return TAXI_ID;
     }
     public double getTotalEarning() {
         return totalEarning;
